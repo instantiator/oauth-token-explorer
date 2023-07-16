@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+
+        <h1>Auth callback</h1>
+
+        <h2>QueryString parameters</h2>
+
+        <p>
+            state <input type="text" id="state" name="state" readonly />
+            <br/>
+            code <input type="text" id="code" name="code" readonly />
+        </p>
+
+        <script>
+        function init() {
+            let params = new URLSearchParams(window.location.search);
+            document.getElementById('state').value = params.get('state');
+            document.getElementById('code').value = params.get('code');
+        }
+
+        init();
+        </script>
+
+    </body>
+</html>

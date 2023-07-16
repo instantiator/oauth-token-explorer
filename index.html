@@ -1,0 +1,96 @@
+<html>
+<head>
+    <title>oauth token explorer - auth request</title>
+</head>
+<body>
+
+    <h1>OAuth token explorer</h1>
+
+    <p>
+        This tool follows the 
+        <a href="https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow">3-legged OAuth flow</a>.
+    </p>
+
+    <h2>Step 1: Register urls</h2>
+
+    <p>
+        Ensure that your callback urls are registered with your auth and token servers.
+    </p>
+    <p>
+        URLs for this application are:
+        <ul>
+            <li><span id="thisAuthCallbackUrl" /></li>
+        </ul>
+    </p>
+
+    <h3>LinkedIn</h3>
+    <p>
+        <ul>
+            <li>Open the <a href="https://www.linkedin.com/developers/apps" target="_blank">developer portal apps list</a></li>
+            <li>Open your app</li>
+            <li>In the <b>Auth</b> tab, add URLs to the <b>OAuth 2.0 settings</b></li>
+        </ul>
+    </p>
+
+    <h2>Step 2: Prepare the auth request</h2>
+
+    <h3>LinkedIn</h3>
+    <p>
+        <ul>
+            <li>Open the <a href="https://www.linkedin.com/developers/apps" target="_blank">developer portal apps list</a></li>
+            <li>Open your app</li>
+            <li>In the <b>Auth</b> tab, credentials are in the <b>Application credentials</b> section (top)</li>
+        </ul>
+    </p>
+    <form id="authForm" method="GET">
+        <p>
+            client_id <input type="text" id="client_id" name="client_id" placeholder="client id" />
+            <br/>
+            scope <input type="text" id="scope" name="scope" placeholder="scope" /> (url encoded, space delimited)
+            <br/>
+            response_type <input type="text" id="response_type" name="response_type" value="code" readonly />
+            <br/>
+            state <input type="text" id="state" name="state" placeholder="something hard to guess" />
+            <br/>
+            redirect_uri <input type="text" id="redirect_uri" name="redirect_uri" placeholder="callback url" />
+        </p>
+    </form>
+    <p>
+        <input type="button" value="Init for LinkedIn" onclick="initLinkedIn()" />
+    </p>
+    
+    <h3>Submit the auth request</h3>
+
+    <p>
+        <input type="text" id="auth_url" placeholder="auth url" />
+        <input type="button" value="GET" onclick="submitAuth()" />
+    </p>
+
+    <script>
+    function init() {
+        document.getElementById("thisAuthCallbackUrl").innerHTML = getRedirectUri();
+        document.getElementById("redirect_uri").value = getRedirectUri();
+    }
+
+    function getRedirectUri() {
+        let url = window.location.href;
+        let shortUrl = url.substring(0,url.lastIndexOf("/"));
+        return shortUrl + "/authCallback.html";
+    }
+
+    function initLinkedIn() {
+        document.getElementById("scope").value = "w_member_social";
+        document.getElementById("state").value = Math.random().toString().substr(2, 6);
+        document.getElementById("auth_url").value = "https://www.linkedin.com/oauth/v2/authorization";
+    }
+
+    function submitAuth() {
+        document.getElementById("authForm").setAttribute("action", document.getElementById("auth_url").value);
+        document.getElementById("authForm").submit();
+    }
+
+    init();
+    </script>
+
+</body>
+</html>

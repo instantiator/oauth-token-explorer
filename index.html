@@ -11,7 +11,7 @@
         <a href="https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow">3-legged OAuth flow</a>.
     </p>
 
-    <h2>Step 1: Register urls</h2>
+    <h2>Step 0: Register urls</h2>
 
     <p>
         Ensure that your callback urls are registered with your auth and token servers.
@@ -32,7 +32,7 @@
         </ul>
     </p>
 
-    <h2>Step 2: Prepare the auth request</h2>
+    <h2>Step 1: Make the auth request</h2>
 
     <h3>LinkedIn</h3>
     <p>
@@ -52,7 +52,7 @@
             <br/>
             state <input type="text" id="state" name="state" placeholder="something hard to guess" />
             <br/>
-            redirect_uri <input type="text" id="redirect_uri" name="redirect_uri" placeholder="callback url" />
+            redirect_uri <input type="text" id="redirect_uri" name="redirect_uri" placeholder="callback url" readonly />
         </p>
     </form>
     <p>

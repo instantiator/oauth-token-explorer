@@ -14,7 +14,7 @@
             code <input type="text" id="code" name="code" readonly />
         </p>
 
-        <h2>Step 2: Submit the access token request</h2>
+        <h2>Step 2: Prepare the access token request</h2>
 
         <p>
             client_id <input type="text" id="client_id" name="client_id" placeholder="client id" />
@@ -23,36 +23,42 @@
             <br/>
             grant_type <input type="text" id="grant_type" name="grant_type" value="authorization_code" readonly />
             <br/>
-            redirect_uri <input type="text" id="redirect_uri" name="redirect_uri" placeholder="url of this page (same as used previously)" readonly />
+            redirect_uri <input type="text" id="redirect_uri" name="redirect_uri" placeholder="callback url" readonly /> (same as used previously)
         </p>
         <p>
             <input type="button" value="Init for LinkedIn" onclick="initLinkedIn()" />
         </p>
     
-        <h3>Submit the access token request</h3>
+        <h3>Prepare the access token request</h3>
 
         <p>
             <input type="text" id="access_url" placeholder="access token url" />
-            <input type="button" value="POST" onclick="submitAccessToken()" />
+            <input type="button" value="Generate" onclick="generateAccessTokenRequest()" />
+        </p>
+
+        <h2>Access token request</h2>
+
+        <h3>curl</h3>
+
+        <p>
+            <textarea id="curl_request_body" rows="7" cols="100"></textarea>
         </p>
 
         <p>
-            NB. This access token POST is submitted through the CORS proxy at: https://proxy.cors.sh/
+            <textarea id="curl_request_query_params" rows="3" cols="100"></textarea>
         </p>
 
-        <h2>Access token</h2>
+        <h2>Using the access token</h2>
 
         <p>
-            <textarea id="access_token" rows="10" cols="100"></textarea>
-            <br/>
-            expires_in <input type="text" id="expires_in" placeholder="access token expiry (secs)" readonly />
-            <br/>
-            scope <input type="text" id="scope" placeholder="scope" readonly />
+            Once you have the token, you can make requests by including it in the Authorization header, ie.
         </p>
-
+        <p>
+            <code>curl -X GET https://api.linkedin.com/v2/me' -H 'Authorization: Bearer {INSERT_TOKEN}'</code>
+        </p>
 
         <script>
-        async function submitAccessToken() {
+        async function generateAccessTokenRequest() {
             let details = {
                 'grant_type': document.getElementById('grant_type').value,
                 'code': document.getElementById('code').value,
@@ -61,26 +67,25 @@
                 'redirect_uri': document.getElementById('redirect_uri').value,
             };
 
-            let formBody = [];
-            for (let property in details) {
-                let encodedKey = encodeURIComponent(property);
-                let encodedValue = encodeURIComponent(details[property]);
-                formBody.push(encodedKey + "=" + encodedValue);
-            }
-            formBody = formBody.join("&");
-            let postUrl = document.getElementById('access_url').value;
-            let proxyUrl = 'https://proxy.cors.sh/';
-            let response = await fetch(proxyUrl + postUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-                },
-                body: formBody
-            });
+            var curl_body = 
+`curl --location --request POST 'https://www.linkedin.com/oauth/v2/accessToken' \\
+  --header 'Content-Type: application/x-www-form-urlencoded' \\
+  --data-urlencode 'grant_type=${details.grant_type}' \\
+  --data-urlencode 'code=${details.code}' \\
+  --data-urlencode 'client_id=${details.client_id}' \\
+  --data-urlencode 'client_secret=${details.client_secret}' \\
+  --data-urlencode 'redirect_uri=${details.redirect_uri}'`;
 
-            document.getElementById('access_token').value = response.json().access_token;
-            document.getElementById('expires_in').value = response.json().expires_in;
-            document.getElementById('scope').value = response.json().scope;
+            var curl_params =
+                `curl --location --request POST 'https://www.linkedin.com/oauth/v2/accessToken?` + 
+                `grant_type=${details.grant_type}&` +
+                `code=${details.code}&` +
+                `redirect_uri=${details.redirect_uri}&` +
+                `client_id=${details.client_id}&` +
+                `client_secret=${details.client_secret}'`;
+
+            document.getElementById('curl_request_body').value = curl_body;
+            document.getElementById('curl_request_query_params').value = curl_params;
         }
 
         function init() {

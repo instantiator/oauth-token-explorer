@@ -1,74 +1,146 @@
-<html>
-    <head>
-        <title></title>
-    </head>
-    <body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Start - OAuth Token Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div w3-include-html="include/nav.html"></div>
 
-        <h1>Auth callback</h1>
+    <div class="container my-5">
+        <h1>2. Request access token</h1>
+        <h2 style="margin-top: 1em;">Response parameters</h2>
+        <p>The query string contains some parameters returned by the OAuth provider.</p>
 
-        <h2>QueryString parameters</h2>
+        <div class="row">
+            <div class="col">
+                <label for="state" class="col-form-label">State</label>
+                <input type="text" class="form-control" id="state" name="state" aria-describedby="stateHelp" placeholder="state" readonly />
+                <small id="stateHelp" class="form-text text-muted">The state value passed in the request.</small>
+            </div>
+            <div class="col">
+                <label for="code" class="col-form-label">Code</label>
+                <input type="text" class="form-control" id="code" name="code" aria-describedby="codeHelp" placeholder="code" readonly />
+                <small id="codeHelp" class="form-text text-muted">The user's authorisation code.</small>
+            </div>
+        </div>
+
+        <h2 style="margin-top: 1em;">Access token request</h2>
+
+        <div class="row">
+            <div class="col">
+                <label for="client_id" class="col-form-label">Client id</label>
+                <input type="text" class="form-control" id="client_id" name="client_id" aria-describedby="clientIdHelp" placeholder="client id" />
+                <small id="clientIdHelp" class="form-text text-muted">OAuth app client id (same as before).</small>
+            </div>
+            <div class="col">
+                <label for="client_secret" class="col-form-label">Client secret</label>
+                <input type="text" class="form-control" id="client_secret" name="client_secret" aria-describedby="clientSecretHelp" placeholder="client secret" />
+                <small id="clientSecretHelp" class="form-text text-muted">OAuth app client secret.</small>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label for="grant_type" class="col-form-label">Grant type</label>
+                <input type="text" class="form-control" id="grant_type" name="grant_type" aria-describedby="grantTypeHelp" value="authorization_code" readonly />
+                <small id="redirectUriHelp" class="form-text text-muted">The grant type should be: <code>authorization_code</code></small>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+
+        <h3 style="margin-top: 1em;">Urls</h3>
+
+        <div class="row">
+            <div class="col">
+                <label for="redirect_uri" class="col-form-label">Redirect URI</label>
+                <input type="text" class="form-control" id="redirect_uri" name="redirect_uri" aria-describedby="redirectUriHelp" placeholder="redirect uri" readonly />
+                <small id="redirectUriHelp" class="form-text text-muted">The redirect/callback URI (same as before).</small>
+            </div>
+            <div class="col">
+                <label for="access_url" class="col-form-label">Access URL</label>
+                <input type="text" class="form-control" id="access_url" name="access_url" aria-describedby="accessUrlHelp" placeholder="access token url" readonly />
+                <small id="accessUrlHelp" class="form-text text-muted">The endpoint to POST access token requests to.</small>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top: 2em;">
+            <div class="col">
+                <input type="button" class="btn btn-secondary" value="Init for LinkedIn" onclick="initLinkedIn()" />
+                <input type="button" class="btn btn-primary" value="Prepare request" onclick="prepareAccessRequest()" />
+            </div>
+        </div>
+
+        <h2 style="margin-top: 1em;">Curl request</h2>
 
         <p>
-            state <input type="text" id="state" name="state" readonly />
-            <br/>
-            code <input type="text" id="code" name="code" readonly />
+            Use the following <code>curl</code> request to retrieve an access token.
         </p>
 
-        <h2>Step 2: Prepare the access token request</h2>
-
         <p>
-            client_id <input type="text" id="client_id" name="client_id" placeholder="client id" />
-            <br/>
-            client_secret <input type="text" id="client_secret" name="client_secret" placeholder="client secret" />
-            <br/>
-            grant_type <input type="text" id="grant_type" name="grant_type" value="authorization_code" readonly />
-            <br/>
-            redirect_uri <input type="text" id="redirect_uri" name="redirect_uri" placeholder="callback url" readonly /> (same as used previously)
-        </p>
-        <p>
-            <input type="button" value="Init for LinkedIn" onclick="initLinkedIn()" />
-        </p>
-    
-        <h3>Prepare the access token request</h3>
-
-        <p>
-            <input type="text" id="access_url" placeholder="access token url" />
-            <input type="button" value="Generate" onclick="generateAccessTokenRequest()" />
-        </p>
-
-        <h2>Access token request</h2>
-
-        <h3>curl</h3>
-
-        <p>
-            <textarea id="curl_request_body" rows="7" cols="100"></textarea>
-        </p>
-
-        <p>
-            <textarea id="curl_request_query_params" rows="3" cols="100"></textarea>
+            <textarea style="font-family:monospace;" class="form-control" id="curl_request_body" rows="8"></textarea>
         </p>
 
         <h2>Using the access token</h2>
 
         <p>
-            Once you have the token, you can make requests by including it in the Authorization header, ie.
+            The response will be a JSON object containing the following keys:
+            <ul>
+                <li><code>access_token</code> - the access token itself</li>
+                <li><code>expires_in</code> - lifetime of the token in seconds</li>
+                <li><code>scope</code> - the OAuth permissions scope that this token grants</li>
+            </ul>
+        </p>
+        <p>
+            ie. <code>{"access_token":"a-very-long-access-token","expires_in":5183999,"scope":"w_member_social"}</code>
+        </p>
+
+        <p>
+            Once you have the token, including it in the <code>Authorization</code> header of future requests to the API, ie.
         </p>
         <p>
             <code>curl -X GET https://api.linkedin.com/v2/me' -H 'Authorization: Bearer {INSERT_TOKEN}'</code>
         </p>
 
-        <script>
-        async function generateAccessTokenRequest() {
+        <!-- <p>
+            <textarea class="form-control" id="curl_request_query_params" rows="8"></textarea>
+        </p> -->
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script src="main.js"></script>
+    <script>
+        includeHTML();
+    </script>
+    <script>
+    function init() {
+        let params = new URLSearchParams(window.location.search);
+        document.getElementById('state').value = params.get('state');
+        document.getElementById('code').value = params.get('code');
+        document.getElementById("redirect_uri").value = getRedirectUri();
+    }
+
+    function initLinkedIn() {
+        console.log("LinkedIn");
+        document.getElementById("access_url").value = "https://www.linkedin.com/oauth/v2/accessToken";
+    }
+
+    function prepareAccessRequest() {
             let details = {
                 'grant_type': document.getElementById('grant_type').value,
                 'code': document.getElementById('code').value,
                 'client_id': document.getElementById('client_id').value,
                 'client_secret': document.getElementById('client_secret').value,
                 'redirect_uri': document.getElementById('redirect_uri').value,
+                'access_url': document.getElementById('access_url').value
             };
 
             var curl_body = 
-`curl --location --request POST 'https://www.linkedin.com/oauth/v2/accessToken' \\
+`curl --location --request POST '${details.access_url}' \\
   --header 'Content-Type: application/x-www-form-urlencoded' \\
   --data-urlencode 'grant_type=${details.grant_type}' \\
   --data-urlencode 'code=${details.code}' \\
@@ -76,37 +148,20 @@
   --data-urlencode 'client_secret=${details.client_secret}' \\
   --data-urlencode 'redirect_uri=${details.redirect_uri}'`;
 
-            var curl_params =
-                `curl --location --request POST 'https://www.linkedin.com/oauth/v2/accessToken?` + 
-                `grant_type=${details.grant_type}&` +
-                `code=${details.code}&` +
-                `redirect_uri=${details.redirect_uri}&` +
-                `client_id=${details.client_id}&` +
-                `client_secret=${details.client_secret}'`;
-
             document.getElementById('curl_request_body').value = curl_body;
-            document.getElementById('curl_request_query_params').value = curl_params;
+
+            // var curl_params =
+            //     `curl --location --request POST 'https://www.linkedin.com/oauth/v2/accessToken?` + 
+            //     `grant_type=${details.grant_type}&` +
+            //     `code=${details.code}&` +
+            //     `redirect_uri=${details.redirect_uri}&` +
+            //     `client_id=${details.client_id}&` +
+            //     `client_secret=${details.client_secret}'`;
+
+            // document.getElementById('curl_request_query_params').value = curl_params;
         }
 
-        function init() {
-            let params = new URLSearchParams(window.location.search);
-            document.getElementById('state').value = params.get('state');
-            document.getElementById('code').value = params.get('code');
-            document.getElementById("redirect_uri").value = getRedirectUri();
-        }
-
-        function initLinkedIn() {
-            document.getElementById("access_url").value = "https://www.linkedin.com/oauth/v2/accessToken";
-        }
-
-        function getRedirectUri() {
-            let url = window.location.href;
-            let shortUrl = url.substring(0,url.lastIndexOf("/"));
-            return shortUrl + "/authCallback.html";
-        }
-
-        init();
-        </script>
-
-    </body>
+    init();
+    </script>
+  </body>
 </html>

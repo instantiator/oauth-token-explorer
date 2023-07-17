@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+
+        <h1>Auth callback</h1>
+
+        <h2>QueryString parameters</h2>
+
+        <p>
+            state <input type="text" id="state" name="state" readonly />
+            <br/>
+            code <input type="text" id="code" name="code" readonly />
+        </p>
+
+        <h2>Step 2: Prepare the access token request</h2>
+
+        <p>
+            client_id <input type="text" id="client_id" name="client_id" placeholder="client id" />
+            <br/>
+            client_secret <input type="text" id="client_secret" name="client_secret" placeholder="client secret" />
+            <br/>
+            grant_type <input type="text" id="grant_type" name="grant_type" value="authorization_code" readonly />
+            <br/>
+            redirect_uri <input type="text" id="redirect_uri" name="redirect_uri" placeholder="callback url" readonly /> (same as used previously)
+        </p>
+        <p>
+            <input type="button" value="Init for LinkedIn" onclick="initLinkedIn()" />
+        </p>
+    
+        <h3>Prepare the access token request</h3>
+
+        <p>
+            <input type="text" id="access_url" placeholder="access token url" />
+            <input type="button" value="Generate" onclick="generateAccessTokenRequest()" />
+        </p>
+
+        <h2>Access token request</h2>
+
+        <h3>curl</h3>
+
+        <p>
+            <textarea id="curl_request_body" rows="7" cols="100"></textarea>
+        </p>
+
+        <p>
+            <textarea id="curl_request_query_params" rows="3" cols="100"></textarea>
+        </p>
+
+        <h2>Using the access token</h2>
+
+        <p>
+            Once you have the token, you can make requests by including it in the Authorization header, ie.
+        </p>
+        <p>
+            <code>curl -X GET https://api.linkedin.com/v2/me' -H 'Authorization: Bearer {INSERT_TOKEN}'</code>
+        </p>
+
+        <script>
+        async function generateAccessTokenRequest() {
+            let details = {
+                'grant_type': document.getElementById('grant_type').value,
+                'code': document.getElementById('code').value,
+                'client_id': document.getElementById('client_id').value,
+                'client_secret': document.getElementById('client_secret').value,
+                'redirect_uri': document.getElementById('redirect_uri').value,
+            };
+
+            var curl_body = 
+`curl --location --request POST 'https://www.linkedin.com/oauth/v2/accessToken' \\
+  --header 'Content-Type: application/x-www-form-urlencoded' \\
+  --data-urlencode 'grant_type=${details.grant_type}' \\
+  --data-urlencode 'code=${details.code}' \\
+  --data-urlencode 'client_id=${details.client_id}' \\
+  --data-urlencode 'client_secret=${details.client_secret}' \\
+  --data-urlencode 'redirect_uri=${details.redirect_uri}'`;
+
+            var curl_params =
+                `curl --location --request POST 'https://www.linkedin.com/oauth/v2/accessToken?` + 
+                `grant_type=${details.grant_type}&` +
+                `code=${details.code}&` +
+                `redirect_uri=${details.redirect_uri}&` +
+                `client_id=${details.client_id}&` +
+                `client_secret=${details.client_secret}'`;
+
+            document.getElementById('curl_request_body').value = curl_body;
+            document.getElementById('curl_request_query_params').value = curl_params;
+        }
+
+        function init() {
+            let params = new URLSearchParams(window.location.search);
+            document.getElementById('state').value = params.get('state');
+            document.getElementById('code').value = params.get('code');
+            document.getElementById("redirect_uri").value = getRedirectUri();
+        }
+
+        function initLinkedIn() {
+            document.getElementById("access_url").value = "https://www.linkedin.com/oauth/v2/accessToken";
+        }
+
+        function getRedirectUri() {
+            let url = window.location.href;
+            let shortUrl = url.substring(0,url.lastIndexOf("/"));
+            return shortUrl + "/authCallback.html";
+        }
+
+        init();
+        </script>
+
+    </body>
+</html>

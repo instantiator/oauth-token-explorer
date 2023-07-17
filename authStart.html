@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Start - OAuth Token Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div w3-include-html="include/nav.html"></div>
+
+    <div class="container my-5">
+        <h1>1. Get user authorisation</h1>
+        <h2>Register urls</h2>
+        <div class="col-lg-8 px-0">
+            <p>
+                Ensure that your callback urls (also known as redirect urls) are registered with your OAuth provider.
+                To find out more about configuring popular providers, see the <b>OAuth providers</b> menu above.
+            </p>
+        </div>
+
+        <h2>Make the auth request</h2>
+
+        <form id="authForm" method="GET">
+            <div class="row">
+                <div class="col">
+                    <label for="client_id" class="col-form-label">Client id</label>
+                    <input type="text" class="form-control" id="client_id" name="client_id" aria-describedby="clientIdHelp" placeholder="client id" />
+                    <small id="clientIdHelp" class="form-text text-muted">The client id for your OAuth application.</small>
+                </div>
+                <div class="col">
+                    <label for="scope" class="col-form-label">Scope</label>
+                    <input type="text" class="form-control" id="scope" name="scope" aria-describedby="scopeHelp" placeholder="scope" />
+                    <small id="scopeHelp" class="form-text text-muted">OAuth scope determines the permissions your app can request.</small>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label for="response_type" class="col-form-label">Response type</label>
+                    <input type="text" class="form-control" id="response_type" name="response_type" aria-describedby="responseTypeHelp" value="code" readonly />
+                    <small id="responseTypeHelp" class="form-text text-muted">The response type must be <code>code</code> for a user authorisation code.</small>
+                </div>
+                <div class="col">
+                    <label for="state" class="col-form-label">State</label>
+                    <input type="text" class="form-control" id="state" name="state" aria-describedby="stateHelp" placeholder="state" />
+                    <small id="stateHelp" class="form-text text-muted">State should be hard to guess. It will be returned with the response.</small>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 1em;">Urls</h3>
+
+            <div class="row">
+                <div class="col">
+                    <label for="redirect_uri" class="col-form-label">Redirect URI</label>
+                    <input type="text" class="form-control" id="redirect_uri" name="redirect_uri" aria-describedby="redirectUriHelp" placeholder="redirect uri" readonly />
+                    <small id="redirectUriHelp" class="form-text text-muted">The redirect URI (also known as callback URI).</small>
+                </div>
+                <div class="col">
+                    <label for="auth_url" class="col-form-label">Auth URL</label>
+                    <input type="text" class="form-control" id="auth_url" name="auth_url" aria-describedby="authUrlHelp" placeholder="auth url" />
+                    <small id="authUrlHelp" class="form-text text-muted">The URL to make the authorisation request to.</small>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top: 2em;">
+                <div class="col">
+                    <input type="button" class="btn btn-secondary" value="Init for LinkedIn" onclick="initLinkedIn()" />
+                    <input type="button" class="btn btn-primary" value="Submit" onclick="submitAuthRequest()" />
+                </div>
+            </div>
+          </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script src="main.js"></script>
+    <script>
+        includeHTML();
+    </script>
+    <script>
+    function init() {
+        document.getElementById("redirect_uri").value = getRedirectUri();
+        document.getElementById("state").value = Math.random().toString().substr(2, 6);
+    }
+
+    function initLinkedIn() {
+        console.log("LinkedIn");
+        document.getElementById("scope").value = "w_member_social";
+        document.getElementById("auth_url").value = "https://www.linkedin.com/oauth/v2/authorization";
+    }
+
+    function submitAuthRequest() {
+        document.getElementById("authForm").setAttribute("action", document.getElementById("auth_url").value);
+        document.getElementById("authForm").submit();
+    }
+
+    init();
+    </script>
+  </body>
+</html>

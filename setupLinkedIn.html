@@ -41,7 +41,39 @@
             <li>Open your app</li>
             <li>In the <b>Auth</b> tab, credentials are in the <b>Application credentials</b> section (top)</li>
         </ul>
-    </p>
+      </p>
+      <h2>Token lifetime</h2>
+      <p>
+        LinkedIn issue access tokens that last for 2 months.
+      </p>
+      <h2>Scopes</h2>
+      <p>
+        <ul>
+          <li>To create posts on LinkedIn on behalf of a user, you will need to add the <b>Share on LinkedIn</b> API product to your registered LinkedIn application.</li>
+          <li>The scope required to use the endpoints provided in this package is: <code>w_member_social</code></li>
+        </ul>
+      </p>
+      <p>
+        <small>
+           <b>NB.</b> The <code>w_</code> prefix represents <b>write</b> permission. An <code>r_</code> prefix represents <b>read</b> permission.
+        </small>
+      </p>
+      <h3>Limitations</h3>
+      <p>
+        There are other API products, although exercise your choice carefully - some are exclusive. For instance, to post to a company page on behalf of the company,
+        you can use either the <b>Community Management API</b> product or the <b>Advertising API</b> - both come with the <code>w_organization_social</code> scope,
+        which is required for this. However:
+        <ul>
+          <li>The <b>Community Management API</b> cannot coexist with other products (ie. it must be the <i>only</i> product selected for an application)</li>
+          <li>The <b>Advertising API</b> requires additional verification through an application form that is made available once you select it</li>
+        </ul>
+      </p>
+      <p>
+        <small>
+          <b>NB.</b> If you have already selected an API product for your application, you cannot remove it - so if you wish to switch, eg. from <b>Share on LinkedIn</b>
+          to <b>Community Management API</b>, you will need to create a new application.
+        </small>
+      </p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
